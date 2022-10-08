@@ -1,95 +1,56 @@
-//make sure the document is ready
+var todayDate = moment().format('dddd, MMM Do YYYY');
+$("#currentDay").html(todayDate);
+
 $(document).ready(function () {
-  //set the 9-5 hour slot display
-  var hourDisplay = [
-    "9AM",
-    "10AM",
-    "11AM",
-    "12PM",
-    "1PM",
-    "2PM",
-    "3PM",
-    "4PM",
-    "5PM",
-  ];
-  var currentHour = moment().format("h");
-  var amPm = moment().format("a");
-  //declare empty array for local storage
-  var savedNote = JSON.parse(localStorage.getItem("savedNote")) || [];
-  //declare input element variable
-  var inputEl;
+     
+    $(".saveBtn").on("click", function () {
+        
+        var text = $(this).siblings(".description").val();
+        var time = $(this).parent().attr("id");
 
-  //get the local storage values
-  var savedCalendarNotes = JSON.parse(localStorage.getItem("savedNote"));
+      
+        localStorage.setItem(time, text);
+    })
+   
+    function timeTracker() {
+        
+        var timeNow = moment().hour();
 
-  //now that the elements have been appended...add the notes from local storage, if any
-  //check to see if the iterated time has notes. if so pull from the local storage
-  function addNotes() {
-    $.each(hourDisplay, function (i, time) {
-      $.each(savedCalendarNotes, function (j, val) {
-        if (time === val.time) {
-          //get appropriate input field
-          var noteEl = $(`[data-time=${time}]`);
-          //set the note field
-          noteEl.val(val.note);
-        }
-      });
-    });
-  }
-  //declare index vars
-  var getIndex;
-  var currentTimeIndex;
+        
+        $(".time-block").each(function () {
+            var blockTime = parseInt($(this).attr("id").split("hour")[1]);
 
-  //run loop to display hourly time from 9-5 along with note field and save button
-  $.each(hourDisplay, function (i, time) {
-    //format current time to look like hourDisplay
-    var currentTime = currentHour + amPm.toUpperCase();
-    //first get the index of the iterated time that is not equal to the current
-    getIndex = hourDisplay.indexOf(currentTime);
-    currentTimeIndex = hourDisplay.indexOf(time);
+           
+            if (blockTime < timeNow) {
+                $(this).removeClass("future");
+                $(this).removeClass("present");
+                $(this).addClass("past");
+            }
+            else if (blockTime === timeNow) {
+                $(this).removeClass("past");
+                $(this).removeClass("future");
+                $(this).addClass("present");
+            }
+            else {
+                $(this).removeClass("present");
+                $(this).removeClass("past");
+                $(this).addClass("future");
 
-    if (currentTime === time) {
-
-      //define the input field to add style during loop based on current time
-      inputEl = `<input type='text' class='bg-danger col border p-3 note text-light' value='' data-time=${time} />`;
-      //capture index
-    } else {
-      //for times other than the current time, turn them blue or gray
-
-      //if in the work day time period but not the curren time and after the current iteration
-      if (getIndex !== -1 && getIndex < currentTimeIndex) {
-        //make the elements green to indicate availibility
-        // inputEl = `<input type='text' class='bg-info col border p-3 note text-light' value='' data-time=${time} />`;
-      } else {
-        //set all other timeslots to gray
-        // inputEl = `<input type='text' class='bg-secondary col border p-3 note text-dark' value='' data-time=${time} />`;
-      }
+            }
+        })
     }
 
-  
-    var row = 
-    $(".calendar").append(row);
-  });
+    
+    $("#hour8 .description").val(localStorage.getItem("hour8"));
+    $("#hour9 .description").val(localStorage.getItem("hour9"));
+    $("#hour10 .description").val(localStorage.getItem("hour10"));
+    $("#hour11 .description").val(localStorage.getItem("hour11"));
+    $("#hour12 .description").val(localStorage.getItem("hour12"));
+    $("#hour13 .description").val(localStorage.getItem("hour13"));
+    $("#hour14 .description").val(localStorage.getItem("hour14"));
+    $("#hour15 .description").val(localStorage.getItem("hour15"));
+    $("#hour16 .description").val(localStorage.getItem("hour16"));
+    $("#hour17 .description").val(localStorage.getItem("hour17"));
 
-  //console.log(moment().format('MMMM Do YYYY'))
-
-  //show current date in header
-  $("#currentDay").text(moment().format("MMMM Do YYYY"));
-
-  //get current time
-  //var currentTime = moment().format('h:mm:ss a');
-
-  //get selected input value
-  $(".saveBtn").on("click", function () {
-    //save selected timeslot (hour) and note to array
-    savedNote.push({
-      time: $(this).prev().prev().text().trim(),
-      note: $(this).prev().val(),
-    });
-
-    //console.log($(this).prev().val())
-    localStorage.setItem("savedNote", JSON.stringify(savedNote));
-  });
-
-  addNotes();
-});
+    timeTracker();
+})
